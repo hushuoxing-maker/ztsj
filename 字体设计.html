@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>深灵·标题字风格引擎 | 专业提示词生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #0b0b1a, #05050f);
+            min-height: 100vh;
+            padding: 24px 28px;
+        }
+
+        /* 顶部核心输入区 */
+        .top-input-area {
+            max-width: 1600px;
+            margin: 0 auto 28px auto;
+            background: rgba(12, 12, 28, 0.75);
+            backdrop-filter: blur(18px);
+            border-radius: 60px;
+            padding: 18px 28px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border: 1px solid rgba(108, 99, 255, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        .input-label-main {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #5f9eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+        .main-text-wrapper {
+            flex: 3;
+            min-width: 240px;
+        }
+        #mainText {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #6c63ff;
+            border-radius: 50px;
+            padding: 14px 24px;
+            font-size: 18px;
+            color: white;
+            outline: none;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        #mainText:focus {
+            border-color: #00c9ff;
+            box-shadow: 0 0 12px #00c9ff66;
+        }
+        .generate-top-btn {
+            background: linear-gradient(95deg, #6c63ff, #2b9eff);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+        .generate-top-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 22px rgba(108, 99, 255, 0.5);
+        }
+
+        /* 左右对称布局容器 */
+        .app-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        /* 左侧分类面板 */
+        .categories-panel {
+            flex: 1.2;
+            min-width: 320px;
+            background: rgba(12, 12, 25, 0.65);
+            backdrop-filter: blur(16px);
+            border-radius: 40px;
+            padding: 24px 20px;
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+            max-height: 85vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .categories-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+        .categories-panel::-webkit-scrollbar-track {
+            background: #1e1a3a;
+            border-radius: 10px;
+        }
+        .categories-panel::-webkit-scrollbar-thumb {
+            background: #6c63ff;
+            border-radius: 10px;
+        }
+
+        .cat-block {
+            margin-bottom: 28px;
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            padding-bottom: 16px;
+        }
+        .cat-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #5f9eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cat-title span {
+            background: rgba(108,99,255,0.3);
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .style-btn {
+            background: rgba(25, 25, 45, 0.8);
+            border: 1px solid rgba(108, 99, 255, 0.5);
+            padding: 8px 16px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #e2e2ff;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .style-btn:hover {
+            background: #6c63ff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(108, 99, 255, 0.4);
+            border-color: transparent;
+        }
+        .style-btn.active {
+            background: linear-gradient(135deg, #6c63ff, #a555ff);
+            color: white;
+            border-color: white;
+            box-shadow: 0 0 10px #6c63ff;
+        }
+        .letter-badge {
+            display: inline-block;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 2px 8px;
+            margin-right: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            color: #bcabff;
+        }
+
+        /* 右侧结果区 */
+        .results-panel {
+            flex: 2.2;
+            min-width: 480px;
+            background: rgba(8, 8, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 28px 26px;
+            border: 1px solid rgba(139, 233, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
+        }
+        .results-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-left: 4px solid #6c63ff;
+            padding-left: 16px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .prompt-card {
+            background: linear-gradient(145deg, rgba(30, 28, 58, 0.8), rgba(20, 18, 45, 0.9));
+            border-radius: 28px;
+            padding: 18px;
+            border: 1px solid rgba(108, 99, 255, 0.4);
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .prompt-card:hover {
+            transform: translateY(-4px);
+            border-color: #8be9ff;
+        }
+        .prompt-index {
+            font-size: 12px;
+            color: #9f9bff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .prompt-text {
+            font-size: 13px;
+            line-height: 1.55;
+            color: #f0f0ff;
+            word-break: break-word;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+        }
+        .copy-btn {
+            background: #2c2868;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 50px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: #6c63ff;
+            transform: scale(0.98);
+        }
+        .quick-tags-bar {
+            margin: 8px 0 12px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 16px;
+            border-radius: 60px;
+        }
+        .badge-tag {
+            background: #1f1b3e;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #3b3680;
+        }
+        .badge-tag.active-opt {
+            background: #ff4d6d;
+            border-color: #ff99b0;
+            color: white;
+            box-shadow: 0 0 6px #ff4d6d;
+        }
+
+        @media (max-width: 960px) {
+            body { padding: 16px; }
+            .top-input-area { flex-direction: column; align-items: stretch; border-radius: 32px; }
+            .input-label-main { white-space: normal; }
+            .generate-top-btn { text-align: center; }
+            .app-wrapper { flex-direction: column; }
+            .results-panel { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部核心文字输入区 (移动到最上面) -->
+<div class="top-input-area">
+    <div class="input-label-main">✍️ 核心文字内容</div>
+    <div class="main-text-wrapper">
+        <input type="text" id="mainText" placeholder="例：苍穹极境 / 浮生若梦 / 赛博纪元 · 品牌/主标题/IP名称" value="未来之光">
+    </div>
+    <button class="generate-top-btn" id="generateTrigger">✨ 生成20组专业提示词 ✨</button>
+</div>
+
+<div class="app-wrapper">
+    <!-- 左侧：全部字母分类按钮矩阵 (左右对称布局保持不变) -->
+    <div class="categories-panel">
+        <!-- 品牌标题字模块 -->
+        <div class="cat-block">
+            <div class="cat-title">🏷️ 品牌标题字 <span>BRAND</span></div>
+            <div class="btn-grid" id="brandGrid"></div>
+        </div>
+        <!-- 海报标题字 -->
+        <div class="cat-block">
+            <div class="cat-title">🎯 海报标题字 <span>POSTER</span></div>
+            <div class="btn-grid" id="posterGrid"></div>
+        </div>
+        <!-- 商业广告标题字 -->
+        <div class="cat-block">
+            <div class="cat-title">💼 商业广告标题字 <span>COMMERCIAL</span></div>
+            <div class="btn-grid" id="commercialGrid"></div>
+        </div>
+        <!-- IP标题字 -->
+        <div class="cat-block">
+            <div class="cat-title">🧸 IP标题字 <span>IP/CARTOON</span></div>
+            <div class="btn-grid" id="ipGrid"></div>
+        </div>
+        <!-- 国潮书法标题字 -->
+        <div class="cat-block">
+            <div class="cat-title">🖌️ 国潮书法标题字 <span>CHAO</span></div>
+            <div class="btn-grid" id="guochaoGrid"></div>
+        </div>
+        <!-- 科技未来标题字 -->
+        <div class="cat-block">
+            <div class="cat-title">🚀 科技未来标题字 <span>TECH</span></div>
+            <div class="btn-grid" id="techGrid"></div>
+        </div>
+
+        <!-- 字体情绪系统 + 情绪识别系统 合并按钮 -->
+        <div class="cat-block">
+            <div class="cat-title">🎭 字体情绪系统 · 情绪识别</div>
+            <div class="btn-grid" id="emotionGrid"></div>
+        </div>
+        <!-- 结构·字重·排版空间 -->
+        <div class="cat-block">
+            <div class="cat-title">📐 结构·字重·排版空间</div>
+            <div class="btn-grid" id="structureGrid"></div>
+        </div>
+        <!-- 材质系统 -->
+        <div class="cat-block">
+            <div class="cat-title">✨ 材质系统 (金属/液态/毛绒/HUD等)</div>
+            <div class="btn-grid" id="materialGrid"></div>
+        </div>
+        <!-- 颜色系统 -->
+        <div class="cat-block">
+            <div class="cat-title">🎨 颜色系统</div>
+            <div class="btn-grid" id="colorGrid"></div>
+        </div>
+        <!-- 动态趋势 -->
+        <div class="cat-block">
+            <div class="cat-title">🌀 动态趋势</div>
+            <div class="btn-grid" id="dynamicGrid"></div>
+        </div>
+        <!-- 行业标题字分类 -->
+        <div class="cat-block">
+            <div class="cat-title">🏭 行业标题字分类</div>
+            <div class="btn-grid" id="industryGrid"></div>
+        </div>
+    </div>
+
+    <!-- 右侧：结果展示区 -->
+    <div class="results-panel">
+        <!-- 快捷锁定标签展示区 -->
+        <div class="quick-tags-bar" id="quickTagsContainer">
+            <span style="font-size:12px; opacity:0.7;">🔘 点击左侧任意字母风格按钮激活核心</span>
+        </div>
+        <div class="results-header">📋 智能提示词矩阵 (共20组)</div>
+        <div id="resultsList" class="results-grid"></div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 1. 定义所有分类数据 (字母分类)
+    const brandSub = [
+        "极简品牌字","高端奢侈字","科技未来字","国潮品牌字","几何品牌字","超级符号字",
+        "英文品牌字","中英混排字","图形融合字","负空间字","图腾化字体","标志化字体"
+    ];
+    const posterSub = [
+        "毛笔飞白字","涂鸦字","朋克字","电商促销字","手写速度字","综艺标题字",
+        "游戏战斗字","机械重工字","高燃热血字","赛博故障字","液态流体字","火焰字",
+        "闪电字","粒子字","潮流街头字"
+    ];
+    const commercialSub = [
+        "高端宋体","现代黑体","时尚细体","轻奢英文字","高级留白字","时尚杂志字",
+        "奢侈品牌字","金属浮雕字","光影字","玻璃质感字"
+    ];
+    const ipSub = [
+        "毛绒字","软糖字","奶油字","气泡字","果冻字","卡通描边字",
+        "玩具塑料字","潮玩立体字","漫画拟声字","Q版字体"
+    ];
+    const guochaoSub = [
+        "行书","草书","隶书","篆书","水墨字","飞白字","武侠字","江湖字","新中式字","传统印章字"
+    ];
+    const techSub = [
+        "赛博字体","HUD字体","故障字体","机械切割字","数据流字体","像素字体",
+        "科幻字","未来几何字","电路板字","AI神经网络字"
+    ];
+    const emotionMap = [
+        "圆润亲和", "尖锐攻击", "粗黑力量", "细长高级", "飞白速度", 
+        "手写温度", "几何科技", "毛笔东方", "液态年轻", "金属硬核", 
+        "破损朋克", "卡通娱乐"
+    ];
+    const moodList = [
+        "热血","治愈","高级","神秘","赛博","朋克","潮流","压迫感","可爱",
+        "暴力美学","奢华","未来","极简","文艺","禅意","国风"
+    ];
+    const structureItems = [
+        "上重心结构","下重心结构","中轴稳定结构","倾斜爆炸结构","放射聚焦结构",
+        "超细字重","细体字重","常规字重","中黑字重","粗黑字重","超粗字重","压缩黑体",
+        "字距疏放","紧密字距","留白呼吸感","高密度聚焦","纵向拉伸空间","横向流动留白"
+    ];
+    const layoutTypes = [
+        "居中式排版","左对齐排版","右对齐排版","斜切式排版","环绕式排版","竖排古文排版",
+        "交错解构排版","模块网格排版","杂志式跨页排版","海报式视觉排版","UI标题风格排版",
+        "横竖混排","中英混排视觉","数字强化排版"
+    ];
+    const materialList = [
+        "金属质感","亚克力光泽","玻璃折射","木纹肌理","石材粗犷","水泥工业","镀铬高光",
+        "霓虹灯管","LED矩阵","荧光涂层","液态熔岩感","冰霜结晶","火焰燃烧","雷电弧光",
+        "烟雾弥散","粒子光晕","能量流体","水波纹荡漾","电流传导","毛绒触感","奶油软胶",
+        "PVC充气感","玩具塑料","泡泡轻盈","果冻Q弹","毛线编织","卡皮巴拉绒感","HUD全息投影",
+        "数据流矩阵","光栅科幻","数字粒子","AI神经网络材质"
+    ];
+    const colorPalette = [
+        "黑金奢华","银灰极简","香槟金璀璨","深墨绿沉静","爱马仕橙活力","深蓝永恒","酒红魅惑",
+        "荧光绿冲击","高饱和粉甜酷","电光蓝未来","紫红渐变迷幻","彩虹渐变张扬",
+        "中国红国韵","青绿山水","水墨黑白禅意","金朱砂贵气","敦煌色典雅",
+        "蓝紫霓虹赛博","青蓝数字感","赛博粉躁动","暖黄食欲感","橙红炽热","奶油白柔润","焦糖棕浓郁"
+    ];
+    const dynamicTrends = [
+        "呼吸灯动态字体","粒子流动画字","流体变形动画","扭曲故障动画","3D旋转字效",
+        "发光脉冲动态","AI生成渐变字","交互感应字体","AR增强现实标题","全息投影字体"
+    ];
+    const industryWords = [
+        "火锅沸腾字","炭火烧烤字","港风招牌字","日料精致字体","国潮餐饮字",
+        "轻奢美业曲线字","韩系水光字体","地产高级宋体","金属质感地产字","现代极简地产字",
+        "AI未来感数据字体","HUD科技感字体","教育学术楷意","黑板粉笔字","电商促销爆炸字",
+        "直播间红黄冲击体"
+    ];
+
+    // 当前激活的主风格 (品牌标题字默认)
+    let activeMainStyle = brandSub[0];
+    // 锁定的扩展参数
+    let lockedEmotion = null;
+    let lockedMood = null;
+    let lockedLayout = null;
+    let lockedMaterial = null;
+    let lockedColor = null;
+    let lockedDynamic = null;
+    let lockedIndustry = null;
+
+    // 辅助渲染左侧按钮网格
+    function renderButtonGrid(containerId, items, prefixLetter = true) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = '';
+        items.forEach((item, idx) => {
+            const btn = document.createElement('button');
+            const letter = String.fromCharCode(65 + (idx % 26));
+            btn.className = 'style-btn';
+            if(prefixLetter) {
+                btn.innerHTML = `<span class="letter-badge">${letter}</span> ${item}`;
+            } else {
+                btn.innerHTML = item;
+            }
+            btn.setAttribute('data-value', item);
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // 同容器内移除高亮
+                document.querySelectorAll(`#${containerId} .style-btn`).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // 根据容器类型更新主风格或锁定参数
+                if(containerId === 'brandGrid') activeMainStyle = item;
+                else if(containerId === 'posterGrid') activeMainStyle = item;
+                else if(containerId === 'commercialGrid') activeMainStyle = item;
+                else if(containerId === 'ipGrid') activeMainStyle = item;
+                else if(containerId === 'guochaoGrid') activeMainStyle = item;
+                else if(containerId === 'techGrid') activeMainStyle = item;
+                else if(containerId === 'emotionGrid') {
+                    if(emotionMap.includes(item) || item.includes("圆润") || item.includes("尖锐") || item.includes("粗黑") || item.includes("细长") || item.includes("飞白") || item.includes("手写") || item.includes("几何") || item.includes("毛笔") || item.includes("液态") || item.includes("金属") || item.includes("破损") || item.includes("卡通")) {
+                        lockedEmotion = item;
+                        lockedMood = null;
+                    } else {
+                        lockedMood = item;
+                        lockedEmotion = null;
+                    }
+                }
+                else if(containerId === 'structureGrid') lockedLayout = item;
+                else if(containerId === 'materialGrid') lockedMaterial = item;
+                else if(containerId === 'colorGrid') lockedColor = item;
+                else if(containerId === 'dynamicGrid') lockedDynamic = item;
+                else if(containerId === 'industryGrid') lockedIndustry = item;
+                updateQuickTagsDisplay();
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    function updateQuickTagsDisplay() {
+        const container = document.getElementById('quickTagsContainer');
+        if(!container) return;
+        let html = `<span style="background:#22205a; padding:4px 12px; border-radius:30px; font-size:13px;">🎯 主风格: ${activeMainStyle}</span>`;
+        if(lockedEmotion) html += `<span class="badge-tag active-opt">😊 情绪:${lockedEmotion}</span>`;
+        if(lockedMood) html += `<span class="badge-tag active-opt">🎭 心境:${lockedMood}</span>`;
+        if(lockedLayout) html += `<span class="badge-tag active-opt">📐 结构/排版:${lockedLayout}</span>`;
+        if(lockedMaterial) html += `<span class="badge-tag active-opt">💎 材质:${lockedMaterial}</span>`;
+        if(lockedColor) html += `<span class="badge-tag active-opt">🎨 色彩:${lockedColor}</span>`;
+        if(lockedDynamic) html += `<span class="badge-tag active-opt">🌀 动态:${lockedDynamic}</span>`;
+        if(lockedIndustry) html += `<span class="badge-tag active-opt">🏭 行业:${lockedIndustry}</span>`;
+        if(!lockedEmotion && !lockedMood && !lockedLayout && !lockedMaterial && !lockedColor && !lockedDynamic && !lockedIndustry)
+            html += `<span style="opacity:0.6; font-size:12px;"> &nbsp; 点击左侧模块锁定额外属性</span>`;
+        container.innerHTML = html;
+    }
+
+    function initAllGrids() {
+        renderButtonGrid('brandGrid', brandSub, true);
+        renderButtonGrid('posterGrid', posterSub, true);
+        renderButtonGrid('commercialGrid', commercialSub, true);
+        renderButtonGrid('ipGrid', ipSub, true);
+        renderButtonGrid('guochaoGrid', guochaoSub, true);
+        renderButtonGrid('techGrid', techSub, true);
+        const allEmotionMood = [...emotionMap, ...moodList];
+        renderButtonGrid('emotionGrid', allEmotionMood, false);
+        const allStructure = [...structureItems, ...layoutTypes];
+        renderButtonGrid('structureGrid', allStructure, false);
+        renderButtonGrid('materialGrid', materialList, false);
+        renderButtonGrid('colorGrid', colorPalette, false);
+        renderButtonGrid('dynamicGrid', dynamicTrends, false);
+        renderButtonGrid('industryGrid', industryWords, false);
+        // 默认高亮品牌第一个按钮
+        document.querySelector('#brandGrid .style-btn')?.classList.add('active');
+        activeMainStyle = brandSub[0];
+        updateQuickTagsDisplay();
+    }
+
+    // 生成不重复提示词 (严格保留输入内容)
+    function generateUniquePrompts(baseText, count = 20) {
+        const promptsSet = new Set();
+        const results = [];
+        const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const allLayouts = layoutTypes;
+        const allMaterials = materialList;
+        const allColors = colorPalette;
+        const allDynamics = dynamicTrends;
+        const allIndustryExtras = industryWords;
+        const allEmotions = [...emotionMap, ...moodList];
+        const allStructureDetail = [...structureItems];
+        
+        let maxLoop = 400;
+        while(results.length < count && maxLoop-- > 0) {
+            let chosenLayout = lockedLayout ? lockedLayout : rand(allLayouts);
+            let chosenMaterial = lockedMaterial ? lockedMaterial : rand(allMaterials);
+            let chosenColor = lockedColor ? lockedColor : rand(allColors);
+            let chosenDynamic = lockedDynamic ? lockedDynamic : rand(allDynamics);
+            let chosenIndustryHint = lockedIndustry ? lockedIndustry : (Math.random() > 0.65 ? rand(allIndustryExtras) : null);
+            let chosenEmo = lockedEmotion ? lockedEmotion : (Math.random() > 0.55 ? rand(allEmotions) : null);
+            let chosenMood = (lockedMood && !lockedEmotion) ? lockedMood : (Math.random() > 0.55 ? rand(moodList) : null);
+            let chosenStruct = rand(allStructureDetail);
+            
+            let promptCore = `“${baseText}” · ${activeMainStyle}设计`;
+            if(chosenEmo) promptCore += `，字体情绪:${chosenEmo}`;
+            if(chosenMood) promptCore += `，情绪识别:${chosenMood}`;
+            promptCore += `，${chosenLayout}`;
+            promptCore += `，${chosenMaterial}质感`;
+            promptCore += `，${chosenColor}配色方案`;
+            if(chosenIndustryHint) promptCore += `，${chosenIndustryHint}风格融合`;
+            promptCore += `，${chosenStruct}字体重心/空间`;
+            promptCore += `，动态趋势:${chosenDynamic}`;
+            promptCore += `，高端视觉冲击，精致细节，适合品牌LOGO/主KV/AI绘画生成，杰作超清`;
+            
+            if(!promptsSet.has(promptCore)) {
+                promptsSet.add(promptCore);
+                results.push(promptCore);
+            }
+        }
+        // 兜底填充
+        if(results.length < count) {
+            for(let i=results.length; i<count; i++) {
+                let fallback = `“${baseText}” · ${activeMainStyle}创意设计，${rand(layoutTypes)}，${rand(materialList)}，${rand(colorPalette)}，极致细节，不重复视觉叙事，杰作`;
+                if(!promptsSet.has(fallback)) results.push(fallback);
+                else results.push(`“${baseText}” · 高定${activeMainStyle}风格 #${i+1}，艺术构图+未来感材质`);
+            }
+        }
+        return results.slice(0, count);
+    }
+
+    // 渲染结果卡片 + 修复复制功能 (使用事件委托确保可靠)
+    function renderPrompts(promptsArr) {
+        const container = document.getElementById('resultsList');
+        container.innerHTML = '';
+        promptsArr.forEach((prompt, idx) => {
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+            const safePrompt = prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            card.innerHTML = `
+                <div class="prompt-index">🔮 提示词 ${idx+1}</div>
+                <div class="prompt-text">${safePrompt}</div>
+                <button class="copy-btn" data-prompt-text="${escapeAttr(prompt)}">📋 复制提示词</button>
+            `;
+            container.appendChild(card);
+        });
+        // 使用事件委托处理复制 (更稳定)
+        container.addEventListener('click', (e) => {
+            const btn = e.target.closest('.copy-btn');
+            if(!btn) return;
+            const rawText = btn.getAttribute('data-prompt-text');
+            if(rawText) {
+                copyToClipboard(rawText, btn);
+            } else {
+                // 后备获取同卡片内prompt-text内容
+                const card = btn.closest('.prompt-card');
+                const promptDiv = card?.querySelector('.prompt-text');
+                if(promptDiv) copyToClipboard(promptDiv.innerText, btn);
+            }
+        });
+    }
+    
+    function escapeAttr(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    
+    async function copyToClipboard(text, buttonElement) {
+        if(!text) return;
+        try {
+            await navigator.clipboard.writeText(text);
+            const originalText = buttonElement.innerText;
+            buttonElement.innerText = '✅ 已复制';
+            setTimeout(() => {
+                buttonElement.innerText = originalText;
+            }, 1600);
+        } catch (err) {
+            // 降级方案
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const original = buttonElement.innerText;
+            buttonElement.innerText = '📋 复制成功';
+            setTimeout(() => {
+                buttonElement.innerText = original;
+            }, 1500);
+        }
+    }
+
+    function handleGenerate() {
+        let rawText = document.getElementById('mainText').value.trim();
+        if(rawText === "") {
+            alert("⚠️ 请输入核心文字内容 (品牌名/标题/文案)");
+            return;
+        }
+        const finalText = rawText;
+        const prompts = generateUniquePrompts(finalText, 20);
+        renderPrompts(prompts);
+    }
+
+    // 初始化所有模块与事件
+    window.addEventListener('DOMContentLoaded', () => {
+        initAllGrids();
+        const genBtn = document.getElementById('generateTrigger');
+        genBtn.addEventListener('click', handleGenerate);
+        // 初次自动生成一组
+        setTimeout(() => {
+            if(document.getElementById('mainText').value.trim() !== "") handleGenerate();
+            else handleGenerate();
+        }, 80);
+    });
+</script>
+</body>
+</html>

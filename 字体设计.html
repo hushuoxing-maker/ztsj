@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>深灵·标题字风格引擎 | 专业提示词生成器</title>
+    <title>深灵·标题字风格引擎 | 专业提示词生成器 · 纯色背景专版</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             padding: 24px 28px;
         }
 
-        /* 顶部核心输入区 */
+        /* 顶部核心输入区 + 背景选择 */
         .top-input-area {
             max-width: 1600px;
             margin: 0 auto 28px auto;
@@ -45,8 +45,8 @@
             letter-spacing: 1px;
         }
         .main-text-wrapper {
-            flex: 3;
-            min-width: 240px;
+            flex: 2;
+            min-width: 220px;
         }
         #mainText {
             width: 100%;
@@ -63,6 +63,32 @@
         #mainText:focus {
             border-color: #00c9ff;
             box-shadow: 0 0 12px #00c9ff66;
+        }
+        .bg-selector {
+            display: flex;
+            gap: 12px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 18px;
+            border-radius: 60px;
+            align-items: center;
+        }
+        .bg-selector span {
+            font-size: 14px;
+            color: #ccc;
+        }
+        .bg-option {
+            background: #2a274d;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.1s;
+        }
+        .bg-option.active-bg {
+            background: linear-gradient(135deg, #6c63ff, #a555ff);
+            box-shadow: 0 0 8px #6c63ff;
         }
         .generate-top-btn {
             background: linear-gradient(95deg, #6c63ff, #2b9eff);
@@ -281,6 +307,7 @@
             body { padding: 16px; }
             .top-input-area { flex-direction: column; align-items: stretch; border-radius: 32px; }
             .input-label-main { white-space: normal; }
+            .bg-selector { justify-content: center; }
             .generate-top-btn { text-align: center; }
             .app-wrapper { flex-direction: column; }
             .results-panel { min-width: auto; }
@@ -289,75 +316,68 @@
 </head>
 <body>
 
-<!-- 顶部核心文字输入区 (移动到最上面) -->
+<!-- 顶部核心输入区 + 背景颜色选择器 -->
 <div class="top-input-area">
     <div class="input-label-main">✍️ 核心文字内容</div>
     <div class="main-text-wrapper">
         <input type="text" id="mainText" placeholder="例：苍穹极境 / 浮生若梦 / 赛博纪元 · 品牌/主标题/IP名称" value="未来之光">
     </div>
+    <div class="bg-selector">
+        <span>🎨 背景颜色：</span>
+        <button class="bg-option" data-bg="white">纯白背景</button>
+        <button class="bg-option" data-bg="black">纯黑背景</button>
+        <button class="bg-option" data-bg="random">随机(白/黑)</button>
+    </div>
     <button class="generate-top-btn" id="generateTrigger">✨ 生成20组专业提示词 ✨</button>
 </div>
 
 <div class="app-wrapper">
-    <!-- 左侧：全部字母分类按钮矩阵 (左右对称布局保持不变) -->
+    <!-- 左侧：全部字母分类按钮矩阵 -->
     <div class="categories-panel">
-        <!-- 品牌标题字模块 -->
         <div class="cat-block">
             <div class="cat-title">🏷️ 品牌标题字 <span>BRAND</span></div>
             <div class="btn-grid" id="brandGrid"></div>
         </div>
-        <!-- 海报标题字 -->
         <div class="cat-block">
             <div class="cat-title">🎯 海报标题字 <span>POSTER</span></div>
             <div class="btn-grid" id="posterGrid"></div>
         </div>
-        <!-- 商业广告标题字 -->
         <div class="cat-block">
             <div class="cat-title">💼 商业广告标题字 <span>COMMERCIAL</span></div>
             <div class="btn-grid" id="commercialGrid"></div>
         </div>
-        <!-- IP标题字 -->
         <div class="cat-block">
             <div class="cat-title">🧸 IP标题字 <span>IP/CARTOON</span></div>
             <div class="btn-grid" id="ipGrid"></div>
         </div>
-        <!-- 国潮书法标题字 -->
         <div class="cat-block">
             <div class="cat-title">🖌️ 国潮书法标题字 <span>CHAO</span></div>
             <div class="btn-grid" id="guochaoGrid"></div>
         </div>
-        <!-- 科技未来标题字 -->
         <div class="cat-block">
             <div class="cat-title">🚀 科技未来标题字 <span>TECH</span></div>
             <div class="btn-grid" id="techGrid"></div>
         </div>
-
-        <!-- 字体情绪系统 + 情绪识别系统 合并按钮 -->
         <div class="cat-block">
             <div class="cat-title">🎭 字体情绪系统 · 情绪识别</div>
             <div class="btn-grid" id="emotionGrid"></div>
         </div>
-        <!-- 结构·字重·排版空间 -->
         <div class="cat-block">
             <div class="cat-title">📐 结构·字重·排版空间</div>
             <div class="btn-grid" id="structureGrid"></div>
         </div>
-        <!-- 材质系统 -->
         <div class="cat-block">
             <div class="cat-title">✨ 材质系统 (金属/液态/毛绒/HUD等)</div>
             <div class="btn-grid" id="materialGrid"></div>
         </div>
-        <!-- 颜色系统 -->
         <div class="cat-block">
             <div class="cat-title">🎨 颜色系统</div>
             <div class="btn-grid" id="colorGrid"></div>
         </div>
-        <!-- 动态趋势 -->
         <div class="cat-block">
             <div class="cat-title">🌀 动态趋势</div>
             <div class="btn-grid" id="dynamicGrid"></div>
         </div>
-        <!-- 行业标题字分类 -->
         <div class="cat-block">
             <div class="cat-title">🏭 行业标题字分类</div>
             <div class="btn-grid" id="industryGrid"></div>
@@ -366,18 +386,16 @@
 
     <!-- 右侧：结果展示区 -->
     <div class="results-panel">
-        <!-- 快捷锁定标签展示区 -->
         <div class="quick-tags-bar" id="quickTagsContainer">
             <span style="font-size:12px; opacity:0.7;">🔘 点击左侧任意字母风格按钮激活核心</span>
         </div>
-        <div class="results-header">📋 智能提示词矩阵 (共20组)</div>
+        <div class="results-header">📋 智能提示词矩阵 (20组 · 纯色背景保证)</div>
         <div id="resultsList" class="results-grid"></div>
     </div>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // 1. 定义所有分类数据 (字母分类)
+    // ---------- 分类数据定义 (与原保持一致) ----------
     const brandSub = [
         "极简品牌字","高端奢侈字","科技未来字","国潮品牌字","几何品牌字","超级符号字",
         "英文品牌字","中英混排字","图形融合字","负空间字","图腾化字体","标志化字体"
@@ -445,9 +463,9 @@
         "直播间红黄冲击体"
     ];
 
-    // 当前激活的主风格 (品牌标题字默认)
+    // 当前激活的主风格
     let activeMainStyle = brandSub[0];
-    // 锁定的扩展参数
+    // 锁定扩展参数
     let lockedEmotion = null;
     let lockedMood = null;
     let lockedLayout = null;
@@ -455,8 +473,10 @@
     let lockedColor = null;
     let lockedDynamic = null;
     let lockedIndustry = null;
+    // 背景色模式： 'white', 'black', 'random'
+    let bgMode = 'random';   // 默认随机纯白/纯黑
 
-    // 辅助渲染左侧按钮网格
+    // 渲染左侧按钮网格 (不变)
     function renderButtonGrid(containerId, items, prefixLetter = true) {
         const container = document.getElementById(containerId);
         if(!container) return;
@@ -473,10 +493,8 @@
             btn.setAttribute('data-value', item);
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // 同容器内移除高亮
                 document.querySelectorAll(`#${containerId} .style-btn`).forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                // 根据容器类型更新主风格或锁定参数
                 if(containerId === 'brandGrid') activeMainStyle = item;
                 else if(containerId === 'posterGrid') activeMainStyle = item;
                 else if(containerId === 'commercialGrid') activeMainStyle = item;
@@ -534,13 +552,38 @@
         renderButtonGrid('colorGrid', colorPalette, false);
         renderButtonGrid('dynamicGrid', dynamicTrends, false);
         renderButtonGrid('industryGrid', industryWords, false);
-        // 默认高亮品牌第一个按钮
         document.querySelector('#brandGrid .style-btn')?.classList.add('active');
         activeMainStyle = brandSub[0];
         updateQuickTagsDisplay();
     }
 
-    // 生成不重复提示词 (严格保留输入内容)
+    // 背景色选择器交互
+    function initBgSelector() {
+        const btns = document.querySelectorAll('.bg-option');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.getAttribute('data-bg');
+                if(mode === 'white') bgMode = 'white';
+                else if(mode === 'black') bgMode = 'black';
+                else bgMode = 'random';
+                btns.forEach(b => b.classList.remove('active-bg'));
+                btn.classList.add('active-bg');
+            });
+        });
+        // 默认激活随机
+        document.querySelector('.bg-option[data-bg="random"]')?.classList.add('active-bg');
+        bgMode = 'random';
+    }
+
+    // 获取背景描述
+    function getBackgroundDesc() {
+        if(bgMode === 'white') return '纯白色背景';
+        if(bgMode === 'black') return '纯黑色背景';
+        // random: 均匀随机
+        return Math.random() < 0.5 ? '纯白色背景' : '纯黑色背景';
+    }
+
+    // 生成20组不重复提示词，强制背景为纯白或纯黑
     function generateUniquePrompts(baseText, count = 20) {
         const promptsSet = new Set();
         const results = [];
@@ -553,7 +596,7 @@
         const allEmotions = [...emotionMap, ...moodList];
         const allStructureDetail = [...structureItems];
         
-        let maxLoop = 400;
+        let maxLoop = 500;
         while(results.length < count && maxLoop-- > 0) {
             let chosenLayout = lockedLayout ? lockedLayout : rand(allLayouts);
             let chosenMaterial = lockedMaterial ? lockedMaterial : rand(allMaterials);
@@ -563,6 +606,8 @@
             let chosenEmo = lockedEmotion ? lockedEmotion : (Math.random() > 0.55 ? rand(allEmotions) : null);
             let chosenMood = (lockedMood && !lockedEmotion) ? lockedMood : (Math.random() > 0.55 ? rand(moodList) : null);
             let chosenStruct = rand(allStructureDetail);
+            // 背景色动态获取 (保证纯白或纯黑)
+            let bgDesc = getBackgroundDesc();
             
             let promptCore = `“${baseText}” · ${activeMainStyle}设计`;
             if(chosenEmo) promptCore += `，字体情绪:${chosenEmo}`;
@@ -573,6 +618,7 @@
             if(chosenIndustryHint) promptCore += `，${chosenIndustryHint}风格融合`;
             promptCore += `，${chosenStruct}字体重心/空间`;
             promptCore += `，动态趋势:${chosenDynamic}`;
+            promptCore += `，${bgDesc}，无杂质单色底`;   // 核心优化：强制纯白/纯黑背景
             promptCore += `，高端视觉冲击，精致细节，适合品牌LOGO/主KV/AI绘画生成，杰作超清`;
             
             if(!promptsSet.has(promptCore)) {
@@ -580,18 +626,18 @@
                 results.push(promptCore);
             }
         }
-        // 兜底填充
         if(results.length < count) {
             for(let i=results.length; i<count; i++) {
-                let fallback = `“${baseText}” · ${activeMainStyle}创意设计，${rand(layoutTypes)}，${rand(materialList)}，${rand(colorPalette)}，极致细节，不重复视觉叙事，杰作`;
+                let bgFallback = getBackgroundDesc();
+                let fallback = `“${baseText}” · ${activeMainStyle}创意设计，${rand(layoutTypes)}，${rand(materialList)}，${rand(colorPalette)}，${bgFallback}，极致细节，不重复视觉叙事，杰作`;
                 if(!promptsSet.has(fallback)) results.push(fallback);
-                else results.push(`“${baseText}” · 高定${activeMainStyle}风格 #${i+1}，艺术构图+未来感材质`);
+                else results.push(`“${baseText}” · 高定${activeMainStyle}风格 #${i+1}，艺术构图+未来感材质，${bgFallback}`);
             }
         }
         return results.slice(0, count);
     }
 
-    // 渲染结果卡片 + 修复复制功能 (使用事件委托确保可靠)
+    // 渲染卡片 + 修复复制 (事件委托)
     function renderPrompts(promptsArr) {
         const container = document.getElementById('resultsList');
         container.innerHTML = '';
@@ -606,7 +652,6 @@
             `;
             container.appendChild(card);
         });
-        // 使用事件委托处理复制 (更稳定)
         container.addEventListener('click', (e) => {
             const btn = e.target.closest('.copy-btn');
             if(!btn) return;
@@ -614,7 +659,6 @@
             if(rawText) {
                 copyToClipboard(rawText, btn);
             } else {
-                // 后备获取同卡片内prompt-text内容
                 const card = btn.closest('.prompt-card');
                 const promptDiv = card?.querySelector('.prompt-text');
                 if(promptDiv) copyToClipboard(promptDiv.innerText, btn);
@@ -636,7 +680,6 @@
                 buttonElement.innerText = originalText;
             }, 1600);
         } catch (err) {
-            // 降级方案
             const textarea = document.createElement('textarea');
             textarea.value = text;
             document.body.appendChild(textarea);
@@ -662,12 +705,11 @@
         renderPrompts(prompts);
     }
 
-    // 初始化所有模块与事件
     window.addEventListener('DOMContentLoaded', () => {
         initAllGrids();
+        initBgSelector();
         const genBtn = document.getElementById('generateTrigger');
         genBtn.addEventListener('click', handleGenerate);
-        // 初次自动生成一组
         setTimeout(() => {
             if(document.getElementById('mainText').value.trim() !== "") handleGenerate();
             else handleGenerate();
